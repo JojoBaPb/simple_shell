@@ -15,6 +15,7 @@ void run_shell();
 void print_prompt();
 void remove_newline(char *str);
 void execute_command(char *command);
+void handle_eof();
 void handle_exit();
 int is_exit_command(char *command);
 

@@ -1,30 +1,19 @@
 #include "shell.h"
 
-/**
- * execute_command - Execute a command.
- * @command: The command to execute.
- */
+/* Function prototypes */
+void run_shell();
+void print_prompt();
 void execute_command(char *command);
-
-/**
- * handle_exit - Handle the exit command.
- */
 void handle_exit();
+int is_exit_command(char *command);
 
-/**
- * main - Entry point of the shell.
- *
- * Return: Always 0.
- */
 int main(void)
 {
 	run_shell();
 	return 0;
 }
 
-/**
- * run_shell - Run the shell loop.
- */
+/* Run the shell loop */
 void run_shell()
 {
 	char command[MAX_COMMAND_LENGTH];
@@ -51,9 +40,7 @@ void run_shell()
 	}
 }
 
-/**
- * print_prompt - Print the shell prompt.
- */
+/* Print the shell prompt */
 void print_prompt()
 {
 	if (isatty(STDOUT_FILENO))
@@ -62,74 +49,45 @@ void print_prompt()
 	}
 }
 
-/**
- * execute_command - Execute a command.
- * @command: The command to execute.
- */
+/* Execute a command */
 void execute_command(char *command)
 {
 	pid_t pid;
 	int status;
 
 	char *args[MAX_ARGS];
-	int i = 0;
+	int i = 1;
 
-	char *path = getenv("PATH");
-	char *path_copy = strdup(path);
-	char *dir = strtok(path_copy, ":");
-	
-	args[i] = strtok(command, " ");
-	while (args[i] != NULL && i < MAX_ARGS - 1)
+	args[0] = strtok(command, " ");
+	while ((args[i] = strtok(NULL, " ")) != NULL && i < MAX_ARGS - 1)
 	{
 		i++;
-		args[i] = strtok(NULL, " ");
+	}
+	args[i] = NULL;
+
+	pid = fork();
+
+	if (pid < 0)
+	{
+		perror("hsh");
+		_exit(EXIT_FAILURE);
 	}
 
-	while (dir != NULL)
+	if (pid == 0)
 	{
-		char command_path[MAX_COMMAND_LENGTH];
-		snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
-
-		if (access(command_path, X_OK) == 0)
+		if (execve(args[0], args, NULL) < 0)
 		{
-			pid = fork();
-
-			if (pid < 0)
-			{
-				perror("hsh");
-				_exit(EXIT_FAILURE);
-			}
-
-			if (pid == 0)
-			{
-				if (execve(command_path, args, NULL) < 0)
-				{
-					perror("hsh");
-					_exit(EXIT_FAILURE);
-				}
-			}
-			else
-			{
-				waitpid(pid, &status, 0);
-			}
-
-			break;
+			perror("hsh");
+			_exit(EXIT_FAILURE);
 		}
-
-		dir = strtok(NULL, ":");
 	}
-
-	free(path_copy);
-
-	if (dir == NULL)
+	else
 	{
-		printf("%s: command not found\n", args[0]);
+		waitpid(pid, &status, 0);
 	}
 }
 
-/**
- * handle_exit - Handle the exit command.
- */
+/* Handle the exit command */
 void handle_exit()
 {
 	if (isatty(STDOUT_FILENO))
@@ -139,12 +97,7 @@ void handle_exit()
 	_exit(EXIT_SUCCESS);
 }
 
-/**
- * is_exit_command - Check if a command is the exit command.
- * @command: The command to check.
- *
- * Return: 1 if it is the exit command, 0 otherwise.
- */
+/* Check if a command is the exit command */
 int is_exit_command(char *command)
 {
 	return strcmp(command, "exit") == 0;
