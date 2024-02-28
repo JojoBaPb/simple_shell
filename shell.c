@@ -1,19 +1,30 @@
 #include "shell.h"
 
-/* Function prototypes */
-void run_shell();
-void print_prompt();
+/**
+ * execute_command - Execute a command.
+ * @command: The command to execute.
+ */
 void execute_command(char *command);
-void handle_exit();
-int is_exit_command(char *command);
 
+/**
+ * handle_exit - Handle the exit command.
+ */
+void handle_exit();
+
+/**
+ * main - Entry point of the shell.
+ *
+ * Return: Always 0.
+ */
 int main(void)
 {
 	run_shell();
 	return 0;
 }
 
-/* Run the shell loop */
+/**
+ * run_shell - Run the shell loop.
+ */
 void run_shell()
 {
 	char command[MAX_COMMAND_LENGTH];
@@ -40,7 +51,9 @@ void run_shell()
 	}
 }
 
-/* Print the shell prompt */
+/**
+ * print_prompt - Print the shell prompt.
+ */
 void print_prompt()
 {
 	if (isatty(STDOUT_FILENO))
@@ -49,45 +62,74 @@ void print_prompt()
 	}
 }
 
-/* Execute a command */
+/**
+ * execute_command - Execute a command.
+ * @command: The command to execute.
+ */
 void execute_command(char *command)
 {
 	pid_t pid;
 	int status;
 
 	char *args[MAX_ARGS];
-	int i = 1;
+	int i = 0;
 
-	args[0] = strtok(command, " ");
-	while ((args[i] = strtok(NULL, " ")) != NULL && i < MAX_ARGS - 1)
+	char *path = getenv("PATH");
+	char *path_copy = strdup(path);
+	char *dir = strtok(path_copy, ":");
+	
+	args[i] = strtok(command, " ");
+	while (args[i] != NULL && i < MAX_ARGS - 1)
 	{
 		i++;
-	}
-	args[i] = NULL;
-
-	pid = fork();
-
-	if (pid < 0)
-	{
-		perror("hsh");
-		_exit(EXIT_FAILURE);
+		args[i] = strtok(NULL, " ");
 	}
 
-	if (pid == 0)
+	while (dir != NULL)
 	{
-		if (execve(args[0], args, NULL) < 0)
+		char command_path[MAX_COMMAND_LENGTH];
+		snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
+
+		if (access(command_path, X_OK) == 0)
 		{
-			perror("hsh");
-			_exit(EXIT_FAILURE);
+			pid = fork();
+
+			if (pid < 0)
+			{
+				perror("hsh");
+				_exit(EXIT_FAILURE);
+			}
+
+			if (pid == 0)
+			{
+				if (execve(command_path, args, NULL) < 0)
+				{
+					perror("hsh");
+					_exit(EXIT_FAILURE);
+				}
+			}
+			else
+			{
+				waitpid(pid, &status, 0);
+			}
+
+			break;
 		}
+
+		dir = strtok(NULL, ":");
 	}
-	else
+
+	free(path_copy);
+
+	if (dir == NULL)
 	{
-		waitpid(pid, &status, 0);
+		printf("%s: command not found\n", args[0]);
 	}
 }
 
-/* Handle the exit command */
+/**
+ * handle_exit - Handle the exit command.
+ */
 void handle_exit()
 {
 	if (isatty(STDOUT_FILENO))
@@ -97,7 +139,12 @@ void handle_exit()
 	_exit(EXIT_SUCCESS);
 }
 
-/* Check if a command is the exit command */
+/**
+ * is_exit_command - Check if a command is the exit command.
+ * @command: The command to check.
+ *
+ * Return: 1 if it is the exit command, 0 otherwise.
+ */
 int is_exit_command(char *command)
 {
 	return strcmp(command, "exit") == 0;
