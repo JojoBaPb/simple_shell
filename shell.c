@@ -1,20 +1,12 @@
 #include "shell.h"
 
-/* Function prototypes */
-void run_shell();
-void print_prompt();
-void execute_command(char *command);
-void handle_exit();
-int is_exit_command(char *command);
+/**
+ * run_shell - Run the shell loop
+ *
+ * return: function
+ */
 
-int main(void)
-{
-	run_shell();
-	return 0;
-}
-
-/* Run the shell loop */
-void run_shell()
+void run_shell(void)
 {
 	char command[MAX_COMMAND_LENGTH];
 
@@ -40,8 +32,13 @@ void run_shell()
 	}
 }
 
-/* Print the shell prompt */
-void print_prompt()
+/**
+ * print_prompt - Print the shell prompt
+ *
+ * return: None
+ */
+
+void print_prompt(void)
 {
 	if (isatty(STDOUT_FILENO))
 	{
@@ -49,7 +46,13 @@ void print_prompt()
 	}
 }
 
-/* Execute a command */
+/**
+ * execute_command - Execute a command
+ * @command: command provided
+ *
+ * return: None
+ */
+
 void execute_command(char *command)
 {
 	pid_t pid;
@@ -87,8 +90,13 @@ void execute_command(char *command)
 	}
 }
 
-/* Handle the exit command */
-void handle_exit()
+/**
+ * handle_exit - Handle the exit command
+ *
+ * return: None
+ */
+
+void handle_exit(void)
 {
 	if (isatty(STDOUT_FILENO))
 	{
@@ -97,9 +105,14 @@ void handle_exit()
 	_exit(EXIT_SUCCESS);
 }
 
-/* Check if a command is the exit command */
+/**
+ * is_exit_command - Check if a command is the exit command
+ * @command: command provided
+ *
+ * return: function
+ */
+
 int is_exit_command(char *command)
 {
-	return strcmp(command, "exit") == 0;
+	return (strcmp(command, "exit") == 0);
 }
-
