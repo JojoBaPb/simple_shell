@@ -3,7 +3,7 @@
 /**
  * run_shell - Run the shell loop
  *
- * return: function
+ * Return: function
  */
 
 void run_shell(void)
@@ -35,7 +35,7 @@ void run_shell(void)
 /**
  * print_prompt - Print the shell prompt
  *
- * return: None
+ * Return: None
  */
 
 void print_prompt(void)
@@ -50,7 +50,7 @@ void print_prompt(void)
  * execute_command - Execute a command
  * @command: command provided
  *
- * return: None
+ * Return: None
  */
 
 void execute_command(char *command)
@@ -93,7 +93,7 @@ void execute_command(char *command)
 /**
  * handle_exit - Handle the exit command
  *
- * return: None
+ * Return: None
  */
 
 void handle_exit(void)
@@ -109,7 +109,7 @@ void handle_exit(void)
  * is_exit_command - Check if a command is the exit command
  * @command: command provided
  *
- * return: function
+ * Return: function
  */
 
 int is_exit_command(char *command)
