@@ -59,9 +59,9 @@ void execute_command(char *command)
 	int status;
 
 	char *token = strtok(command, " ");
-	
+
 	char *args[MAX_ARGS];
-        
+
 	int i = 1;
 
 	if (token == NULL)
