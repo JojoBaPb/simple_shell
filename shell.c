@@ -58,8 +58,17 @@ void execute_command(char *command)
 	pid_t pid;
 	int status;
 
+	char *token = strtok(command, " ");
+	
 	char *args[MAX_ARGS];
+        
 	int i = 1;
+
+	if (token == NULL)
+	{
+
+		return;
+	}
 
 	args[0] = strtok(command, " ");
 	while ((args[i] = strtok(NULL, " ")) != NULL && i < MAX_ARGS - 1)
