@@ -94,9 +94,7 @@ void execute_command(char *command)
 		}
 	}
 	else
-	{
 		waitpid(pid, &status, 0);
-	}
 }
 
 /**
